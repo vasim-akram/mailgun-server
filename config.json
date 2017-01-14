@@ -1,0 +1,9 @@
+{
+  "server_host": "localhost",
+  "server_port": 8000,
+  "amqp_url" : "amqp://localhost",
+  "amqp_queue": "hello",
+  "mailgun_api_key": "key-908a72d40fcb0d2f75a92570aaa076ab",
+  "mailgun_domain": "sandbox7ff8f192f6514d6b8a962d2989895295.mailgun.org",
+  "mailgun_sender": "Do Not Reply <postmaster@sandbox7ff8f192f6514d6b8a962d2989895295.mailgun.org>"
+}

@@ -2,16 +2,16 @@
 
 let Hapi = require('hapi');
 let amqp = require('amqplib/callback_api');
-
-var api_key = 'key-908a72d40fcb0d2f75a92570aaa076ab';
-var domain = 'sandbox7ff8f192f6514d6b8a962d2989895295.mailgun.org';
-var mailgun = require('mailgun-js')({apiKey: api_key, domain: domain});
+let Config = require('./config.json');
+//var api_key = 'key-908a72d40fcb0d2f75a92570aaa076ab';
+//var domain = 'sandbox7ff8f192f6514d6b8a962d2989895295.mailgun.org';
+var mailgun = require('mailgun-js')({apiKey: Config.mailgun_api_key, domain: Config.mailgun_domain});
 
 // Create a server with a host and port
 let server = new Hapi.Server();
 server.connection({
-    host: 'localhost',
-    port: 8000
+    host: Config.server_host,
+    port: Config.server_port
 });
 
 var q = 'tasks';
@@ -48,13 +48,13 @@ function consumer(conn) {
     let res = [];
     ch.assertQueue(q, {durable: false}, function(err, ok) {
       if (err !== null) return bail(err, conn);
-      ch.consume(q, function(msg) { // message callback
+      ch.consume(Config.amqp_queue, function(msg) { // message callback
          res = JSON.parse(msg.content);
          console.log(" [x] Received for =>'%s'",res[0].purpose);
          var data = {
-           from: 'Do Not Reply <postmaster@sandbox7ff8f192f6514d6b8a962d2989895295.mailgun.org>',
+           from: Config.mailgun_sender,
            to: 'Vasim '+res[0].to_email,
-           subject: 'Reset Password Verification',
+           subject: 'Email Confirmation',
            html: '<b>Testing some Mailgun awesomness!</b>'
          };
 
@@ -70,7 +70,7 @@ function consumer(conn) {
   }
 }
 
-   amqp.connect('amqp://localhost', function(err, conn) {
+   amqp.connect(Config.amqp_url, function(err, conn) {
      if (err != null) bail(err);
      consumer(conn);
      //publisher(conn);
